@@ -1,147 +1,163 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-//import 'package:toast/toast.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home: Home(),
-  ));
+  runApp(
+    const ProviderScope(),
+  );
+}
+
+/// ProviderScope: um wrapper simples usando BlocProvider
+class ProviderScope extends StatelessWidget {
+  const ProviderScope({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => ImcCubit()),
+      ],
+      child: MaterialApp(
+        theme: ThemeData(
+          useMaterial3: true,
+          colorSchemeSeed: Colors.deepPurple,
+        ),
+        home: const Home(),
+      ),
+    );
+  }
+}
+
+/// Cubit do IMC
+class ImcCubit extends Cubit<String> {
+  ImcCubit() : super('Informe seus dados!');
+
+  void calcular(double peso, double alturaCm) {
+    try {
+      final h = alturaCm / 100;
+      final imc = peso / (h * h);
+
+      String result;
+      if (imc < 18.6) {
+        result = 'Abaixo do peso (IMC = ${imc.toStringAsPrecision(3)})';
+      } else if (imc < 24.9) {
+        result = 'Peso ideal (IMC = ${imc.toStringAsPrecision(3)})';
+      } else if (imc < 29.9) {
+        result = 'Sobrepeso (IMC = ${imc.toStringAsPrecision(3)})';
+      } else if (imc < 34.9) {
+        result = 'Obesidade grau I (IMC = ${imc.toStringAsPrecision(3)})';
+      } else if (imc < 39.9) {
+        result = 'Obesidade grau II (IMC = ${imc.toStringAsPrecision(3)})';
+      } else {
+        result = 'Obesidade grau III (IMC = ${imc.toStringAsPrecision(3)})';
+      }
+
+      emit(result);
+    } catch (_) {
+      emit('Valores inválidos');
+    }
+  }
+
+  void reset() => emit('Informe seus dados!');
 }
 
 class Home extends StatefulWidget {
+  const Home({super.key});
+
   @override
-  _HomeState createState() => _HomeState();
+  State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
-  TextEditingController weightController = TextEditingController();
-  TextEditingController heightController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final pesoCtrl = TextEditingController();
+  final alturaCtrl = TextEditingController();
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  String _infoText = 'Informe seus dados!';
-
-  String _heightAlert = 'Informe sua altura';
-
-  String _weightAlert = 'Informe seu peso';
-
-  void _resetFields() {
-    weightController.clear();
-    heightController.clear();
-    setState(() {
-      _infoText = 'Informe seus dados!';
-      _formKey = GlobalKey<FormState>();
-    });
-  }
-
-  /*void showToast(String msg, {int duration, int gravity}) {
-    Toast.show(msg, context, duration: duration, gravity: gravity, textColor: Colors.red);
-  }*/
-
-  void _calculate() {
-    setState(() {
-      double weight = double.parse(weightController.text);
-      double height = double.parse(heightController.text) / 100;
-
-      double imc = weight / (height * height);
-      if (imc < 18.6) {
-        _infoText = 'Abaixo do peso (IMC = ${imc.toStringAsPrecision(3)})';
-      } else if (imc >= 18.6 && imc < 24.9) {
-        _infoText = 'Peso ideal (IMC = ${imc.toStringAsPrecision(3)})';
-      } else if (imc >= 24.9 && imc < 29.9) {
-        _infoText = 'Sobrepeso (IMC = ${imc.toStringAsPrecision(3)})';
-      } else if (imc >= 29.9 && imc < 34.9) {
-        _infoText = 'Obesidade grau I (IMC = ${imc.toStringAsPrecision(3)})';
-      } else if (imc >= 34.9 && imc < 39.9) {
-        _infoText = 'Obesidade grau II (IMC = ${imc.toStringAsPrecision(3)})';
-      } else if (imc >= 40.0) {
-        _infoText = 'Obesidade grau III (IMC = ${imc.toStringAsPrecision(3)})';
-      }
-    });
+  @override
+  void dispose() {
+    pesoCtrl.dispose();
+    alturaCtrl.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final cubit = context.read<ImcCubit>();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text("Calculadora de IMC"),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
+        title: const Text('Calculadora de IMC'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: _resetFields,
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              cubit.reset();
+              pesoCtrl.clear();
+              alturaCtrl.clear();
+            },
           ),
         ],
       ),
-      backgroundColor: Colors.white,
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(12.0, 0.0, 12.0, 0.0),
+        padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Icon(
-                Icons.person,
-                color: Colors.amber,
-                size: 120.0,
-              ),
+              const Icon(Icons.person, size: 120, color: Colors.amber),
+
+              /// Peso
               TextFormField(
+                controller: pesoCtrl,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                    labelText: "Peso (kg)",
-                    labelStyle: TextStyle(color: Colors.black)),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 25.0),
-                controller: weightController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return _weightAlert;
-                    //Toast.show("Insira o peso", context, duration: Toast.LENGTH_LONG, gravity: Toast.CENTER, textColor: Colors.red);
-                  }
-                  return null;
-                },
+                decoration: const InputDecoration(
+                  labelText: 'Peso (kg)',
+                  prefixIcon: Icon(Icons.monitor_weight),
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r"[0-9.]")),
+                ],
+                validator: (v) => v == null || v.isEmpty ? 'Informe seu peso' : null,
               ),
+              const SizedBox(height: 12),
+
+              /// Altura com máscara (only digits)
               TextFormField(
+                controller: alturaCtrl,
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                    labelText: "Altura (cm)",
-                    labelStyle: TextStyle(color: Colors.black)),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 25.0),
-                controller: heightController,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return _heightAlert;
-                    //Toast.show("Insira a altura", context, duration: Toast.LENGTH_LONG, gravity: Toast.CENTER, textColor: Colors.red);
-                  }
-                  return null;
-                },
+                decoration: const InputDecoration(
+                  labelText: 'Altura (cm)',
+                  prefixIcon: Icon(Icons.height),
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                ],
+                validator: (v) => v == null || v.isEmpty ? 'Informe sua altura' : null,
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 18.0, bottom: 12.0),
-                child: Container(
-                  height: 50.0,
-                  child: RaisedButton(
-                    onPressed: () {
-                      if(_formKey.currentState.validate()){
-                        _calculate();
-                      }
-                    },
-                    child: Text(
-                      "Calcular",
-                      style: TextStyle(color: Colors.white, fontSize: 25.0),
-                    ),
-                    color: Colors.deepPurple,
-                  ),
+              const SizedBox(height: 20),
+
+              FilledButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    cubit.calcular(
+                      double.parse(pesoCtrl.text),
+                      double.parse(alturaCtrl.text),
+                    );
+                  }
+                },
+                child: const Text('Calcular'),
+              ),
+              const SizedBox(height: 20),
+
+              BlocBuilder<ImcCubit, String>(
+                builder: (_, state) => Text(
+                  state,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 24),
                 ),
               ),
-              Text(
-                _infoText,
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black, fontSize: 25.0),
-              )
             ],
           ),
         ),
