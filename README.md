@@ -53,4 +53,4 @@ Este projeto está sob a licença MIT. Sinta‑se livre para usar, melhorar e di
 
 ---
 
-Desenvolvido com ❤️ e um pouco de teimosia pelo Boleto.
+Desenvolvido com ❤️ e um pouco de carimbó por Boleto.
