@@ -1,16 +1,56 @@
-# calculadora_imc
+# 📱 Calculadora de IMC
 
-Calculadora de IMC
+![Flutter](https://img.shields.io/badge/Flutter-3.19-blue?logo=flutter)
+![Dart](https://img.shields.io/badge/Dart-3.0-blue?logo=dart)
+![License](https://img.shields.io/badge/License-MIT-green)
 
-## Getting Started
+Uma calculadora de IMC simples, rápida e estilosa construída em Flutter usando **Material 3**, máscaras de entrada e arquitetura organizada.
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+<p align="center">
+  <img src="https://media.giphy.com/media/FH2vOPzhBPWGk/giphy.gif" width="150">
+</p>
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+---
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ✨ Funcionalidades
+
+* 🧮 Cálculo instantâneo do IMC
+* 🎨 Interface usando **Material 3**
+* 🔢 Campo de entrada com máscara
+* 📊 Classificação automática (baixo peso, normal, sobrepeso…)
+* 💡 Código simples, limpo e fácil de evoluir
+
+---
+
+## 🚀 Instalação
+
+```bash
+git clone https://github.com/seuusuario/calculadora_imc.git
+cd calculadora_imc
+flutter pub get
+flutter run
+```
+
+---
+
+## 📚 Sobre IMC
+
+O IMC (Índice de Massa Corporal) é um cálculo simples usado para avaliar o peso corporal em relação à altura. Não substitui avaliação profissional, mas é um bom indicador inicial.
+
+---
+
+## 🤝 Contribuições
+
+Pull requests são muito bem‑vindos! Para grandes mudanças, abra uma issue antes.
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Sinta‑se livre para usar, melhorar e divulgar.
+
+---
+
+Desenvolvido com ❤️ e um pouco de teimosia pelo Boleto.
